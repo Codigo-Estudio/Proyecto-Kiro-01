@@ -1,3 +1,5 @@
+# Requirements Document
+
 # Requirements Document: Flappy Kiro
 
 ## Introduction
@@ -33,7 +35,7 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 
 #### Acceptance Criteria
 
-1. WHEN a pipe exits the left side of the Game Area, THE Pipe Spawner SHALL create a new pipe on the right side
+1. WHERE the game is actively running, WHEN a pipe exits the left side of the Game Area, THE Pipe Spawner SHALL create a new pipe on the right side
 2. WHEN a new pipe is created, THE Pipe Spawner SHALL position it with a gap between 100 and 250 pixels tall
 3. WHEN a pipe is created, THE Pipe Spawner SHALL randomly position the gap vertically within the Game Area
 4. WHILE the game is running, THE Pipes SHALL move leftward at 150 pixels per second
@@ -49,6 +51,7 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 2. WHEN the Ghost's bottom edge intersects with the bottom of the Game Area, THE Collision Detector SHALL trigger the Game Over state
 3. WHEN the Ghost's top edge intersects with the top of the Game Area, THE Collision Detector SHALL trigger the Game Over state
 4. WHEN a collision occurs, THE Collision Detector SHALL record the collision time for potential visual effects
+5. IF collision detection fails to execute, THE Failsafe Mechanism SHALL log the error and ensure the Game Over state is triggered
 
 ### Requirement 4: Scoring System
 
@@ -59,7 +62,7 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 1. WHEN the Ghost successfully passes through a pipe gap, THE Score Manager SHALL increment the Score by 1
 2. WHEN the Game Over state is triggered, THE Score Manager SHALL preserve the final Score
 3. WHEN a new game starts, THE Score Manager SHALL reset the Score to 0
-4. WHILE the game is running, THE Score Display SHALL update in real-time to show the current Score
+4. WHILE in the Game Over state, THE Score Display SHALL show the frozen Final Score and not update
 
 ### Requirement 5: Game States
 
@@ -84,7 +87,8 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 2. WHILE in the Playing state, THE Renderer SHALL draw all active Pipes at their current positions each frame
 3. WHILE in the Start Screen state, THE Renderer SHALL display the Game Title and instructions
 4. WHILE in the Game Over state, THE Renderer SHALL display the Final Score and restart option
-5. THE Renderer SHALL clear the Game Area and redraw all elements at 60 frames per second
+5. WHERE a game state has changed, THE Renderer SHALL clear and redraw only the affected areas of the Game Area
+6. WHEN UI elements should appear, THE UI Manager SHALL only render them during their designated game states
 
 ### Requirement 7: Audio Feedback
 
@@ -96,6 +100,7 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 2. WHEN the Ghost collides with a Pipe, THE Audio Manager SHALL play the Game Over Sound
 3. WHEN the Ghost successfully passes through a Pipe, THE Audio Manager SHALL play the Score Sound
 4. WHEN the game starts, THE Audio Manager SHALL play the Background Music Loop
+5. IF audio initialization or playback fails, THE Audio Manager SHALL continue game operation without audio feedback
 
 ### Requirement 8: Input Handling
 
@@ -103,9 +108,9 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 
 #### Acceptance Criteria
 
-1. WHEN the player presses the spacebar, THE Input Handler SHALL register the event and apply upward force
-2. WHEN the player clicks anywhere on the Game Area, THE Input Handler SHALL register the event and apply upward force
-3. WHEN the player taps on a touch-enabled device, THE Input Handler SHALL register the event and apply upward force
+1. WHERE the game is in the Playing state, WHEN the player presses the spacebar, THE Input Handler SHALL register the event and apply upward force
+2. WHERE the game is in the Playing state, WHEN the player clicks anywhere on the Game Area, THE Input Handler SHALL register the event and apply upward force
+3. WHERE the game is in the Playing state, WHEN the player taps on a touch-enabled device, THE Input Handler SHALL register the event and apply upward force
 4. THE Input Handler SHALL prioritize the most recent input event when multiple inputs occur simultaneously
 
 ### Requirement 9: Game Persistence
@@ -118,6 +123,7 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 2. WHEN the Final Score exceeds the High Score, THE Persistence Manager SHALL save the new High Score
 3. WHEN the game loads, THE Persistence Manager SHALL retrieve the stored High Score
 4. WHILE in the Game Over state, THE Persistence Manager SHALL display the High Score alongside the Final Score
+5. IF the High Score is unavailable, THE Persistence Manager SHALL display placeholder values (0 for score, N/A for high score)
 
 ### Requirement 10: Responsive Design
 
@@ -128,7 +134,8 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 1. WHEN the browser window resizes, THE Layout Manager SHALL adjust the Game Area dimensions
 2. WHEN the Layout Manager adjusts dimensions, THE Game Elements SHALL reposition proportionally
 3. WHEN the game loads, THE Layout Manager SHALL ensure the Game Area maintains a 4:3 aspect ratio
-4. THE Layout Manager SHALL prevent the Game Area from exceeding 1024 pixels in width or 768 pixels in height
+4. WHERE screen real estate is limited, THE Layout Manager SHALL allow aspect ratio to deviate from 4:3 to maximize available screen space
+5. THE Layout Manager SHALL prevent the Game Area from exceeding 1024 pixels in width or 768 pixels in height
 
 ### Requirement 11: Difficulty Progression
 
@@ -147,10 +154,11 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 
 #### Acceptance Criteria
 
-1. WHILE in the Playing state, THE Game Loop SHALL execute the Update Phase and Render Phase each frame
-2. WHEN a frame completes, THE Game Loop SHALL calculate delta time for frame-rate-independent movement
-3. WHEN delta time exceeds 0.1 seconds, THE Game Loop SHALL cap the delta time to prevent physics anomalies
-4. WHILE in the Game Over state, THE Game Loop SHALL pause all physics calculations but continue rendering
+1. WHILE in the Playing state, THE Game Loop SHALL execute the Update Phase and Render Phase together each frame
+2. WHEN a frame update fails, THE Game Loop SHALL skip the Render Phase and continue to the next frame
+3. WHEN a frame completes, THE Game Loop SHALL calculate delta time for frame-rate-independent movement
+4. WHEN delta time exceeds 0.1 seconds, THE Game Loop SHALL cap the delta time to prevent physics anomalies
+5. WHILE in the Game Over state, THE Game Loop SHALL pause all physics calculations but continue rendering
 
 ### Requirement 13: Reset Functionality
 
@@ -162,6 +170,7 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 2. WHEN the player initiates a restart, THE Reset Manager SHALL remove all active Pipes
 3. WHEN the player initiates a restart, THE Reset Manager SHALL reset the Score to 0
 4. WHEN the player initiates a restart, THE Reset Manager SHALL reset the Difficulty Manager to initial values
+5. WHERE the game is in the Restarting state, THE Reset Manager SHALL allow new pipes to be created
 
 ### Requirement 14: Performance Optimization
 
@@ -171,5 +180,19 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 
 1. WHEN the game runs, THE Performance Monitor SHALL maintain 60 frames per second on modern devices
 2. WHEN frame rate drops below 30 FPS, THE Performance Monitor SHALL reduce visual effects
-3. WHEN memory usage exceeds 100MB, THE Memory Manager SHALL clean up unused assets
-4. THE Game Loop SHALL process input events before physics calculations each frame
+3. WHEN memory usage exceeds 100MB, THE Memory Manager SHALL initiate cleanup of unused assets
+4. WHERE memory cleanup is needed, THE Memory Manager SHALL execute escalating fallback measures starting with visual effects reduction
+5. THE Game Loop SHALL process input events before physics calculations each frame
+
+### Requirement 15: Cloud Perspective Effects
+
+**User Story:** As the game, I want to implement cloud perspective effects, so that the game world appears more realistic and immersive.
+
+#### Acceptance Criteria
+
+1. WHILE in the Playing state, THE Renderer SHALL draw Cloud Elements behind all game elements
+2. WHEN a cloud element is created, THE Cloud Manager SHALL assign it a transparency value between 30% and 70%
+3. WHILE the game is running, THE Cloud Manager SHALL move clouds at different speeds: near clouds at 100 pixels per second, far clouds at 50 pixels per second
+4. WHEN a cloud exits the left side of the Game Area, THE Cloud Manager SHALL reposition it to the right side
+5. WHEN the game loads, THE Cloud Manager SHALL create at least 3 cloud elements at random vertical positions
+6. WHILE in the Playing state, THE Cloud Manager SHALL update cloud positions each frame based on delta time
