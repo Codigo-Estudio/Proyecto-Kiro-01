@@ -5,7 +5,7 @@
 This implementation plan breaks down the Flappy Kiro game development into 15+ major tasks covering all 15 requirements. The plan follows a component-based approach with clear separation of concerns. Property-based tests are included where applicable to validate correctness properties defined in the design document.
 
 **Changes from original:**
-- Reorganized Task 4 from 'Physics Engine' to 'Game Loop Management' to better reflect the dependency order
+- Reorganized Task 4 from "Physics Engine" to "Game Loop Management" to better reflect the dependency order
 - Updated Task 4.3 to properly reference input event ordering (Requirement 12.5)
 - Reorganized Task 12 to Responsive Layout before Difficulty Progression for better logical flow
 - Added new Property 9: Cloud depth consistency for cloud perspective effects
@@ -21,12 +21,12 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
   - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15_
 
 - [ ] 1.5 Create Configuration System
-  - Create src/config/constants.ts with all numerical values for game parameters
+  - Create `src/config/constants.ts` with all numerical values for game parameters
   - Define TypeScript interfaces for configuration (GameConfig, DifficultySettings, etc.)
   - Organize values into logical groups: physics, entities, pipes, clouds, scoring, difficulty, performance, layout, colors
-  - Add comments documenting each parameter's purpose
-  - Create src/config/settings.ts with tunable parameters (for game balance)
-  - Create src/config/profiles.ts with difficulty presets (easy, normal, hard)
+  - Add comments documenting each parameter'\''s purpose
+  - Create `src/config/settings.ts` with tunable parameters (for game balance)
+  - Create `src/config/profiles.ts` with difficulty presets (easy, normal, hard)
   - Implement simple config loader that can merge default config with overrides
   - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 (all requirements via configuration)_
 
@@ -85,7 +85,7 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
 
 - [ ] 5. Implement Physics Engine
   - [ ] 5.1 Create Physics Engine component
-    - Calculate ghost position using delta time: y_new = y_old + velocity * delta_time
+    - Calculate ghost position using delta time: `y_new = y_old + velocity * delta_time`
     - Apply constant gravity (500 px/s² downward)
     - Apply flap velocity (200 px/s upward on input)
     - _Requirements: 1.3, 1.4_
@@ -195,7 +195,7 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
     - **Property 3: Score accuracy**
     - **Validates: Requirements 4.1, 4.2**
     - Test that score equals number of unique pipes passed
-    - Test that passing same pipe multiple times doesn't increase score
+    - Test that passing same pipe multiple times doesn'\''t increase score
 
 - [ ] 10. Implement Visual Rendering System
   - [ ] 10.1 Create Renderer component
@@ -246,7 +246,7 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
   
   - [ ] 11.6 Implement graceful degradation
     - Continue game operation without audio on initialization failures
-    - Log audio errors but don't block game execution
+    - Log audio errors but don'\''t block game execution
     - _Requirements: 7.5_
 
 - [ ] 12. Implement Persistence System
@@ -413,22 +413,24 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
   - Ensure all 15 requirements are fully implemented and tested
   - Ask the user if questions arise.
 
-## Task Dependency Graph`n`n```json{
-  
-waves: [
-    { id: 0, tasks: [1] },
-    { id: 1, tasks: [1.5, 2, 3, 4, 5, 6, 7] },
-    { id: 2, tasks: [8, 9, 10, 11, 12, 13] },
-    { id: 3, tasks: [14, 15, 16, 17] },
-    { id: 4, tasks: [18] },
-    { id: 5, tasks: [19] }
+## Task Dependency Graph
+
+```json
+{
+  "waves": [
+    { "id": 0, "tasks": ["1"] },
+    { "id": 1, "tasks": ["1.5", "2", "3", "4", "5", "6", "7"] },
+    { "id": 2, "tasks": ["8", "9", "10", "11", "12", "13"] },
+    { "id": 3, "tasks": ["14", "15", "16", "17"] },
+    { "id": 4, "tasks": ["18"] },
+    { "id": 5, "tasks": ["19"] }
   ]
 }
-`
+```
 
 ## Notes
 
-- Tasks marked with * are optional and can be skipped for faster MVP
+- Tasks marked with `*` are optional and can be skipped for faster MVP
 - Core implementation tasks should not be marked optional
 - Property-based tests validate universal correctness properties
 - Integration tests verify end-to-end flows
@@ -454,7 +456,7 @@ The following properties are validated through property-based tests:
 
 ## Test Files Structure
 
-`
+```
 tests/
 ├── physics/
 │   ├── position_update.test.ts
@@ -514,6 +516,4 @@ tests/
     ├── reset_consistency.test.ts
     ├── responsive_layout.test.ts
     └── cloud_depth.test.ts
-`
-
-
+```
