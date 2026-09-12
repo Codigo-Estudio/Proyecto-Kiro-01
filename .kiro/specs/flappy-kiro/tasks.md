@@ -10,6 +10,9 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
 - Reorganized Task 12 to Responsive Layout before Difficulty Progression for better logical flow
 - Added new Property 9: Cloud depth consistency for cloud perspective effects
 - Updated dependency graph to reflect new task organization
+- Updated physics parameters: gravity (800 px/s²), flap velocity (-300 px/s), wall bounce (120 px/s)
+- Updated pipe configuration: gap size (140 px), pipe distance (350 px)
+- Fixed duplicate sub-task numbering (6.4 → 6.5) in task list
 
 ## Tasks
 
@@ -18,6 +21,8 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
   - Define TypeScript interfaces for all data models (Ghost, Pipe, Cloud, GameSession, DifficultySettings)
   - Set up main game loop structure with update and render phases
   - Create core utility functions for random number generation and collision detection
+  - Define physics constants: gravity (800 px/s²), flap velocity (-300 px/s), wall bounce (120 px/s)
+  - Define pipe configuration: gap size (140 px), pipe distance (350 px)
   - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15_
 
 - [ ] 1.5 Create Configuration System
@@ -86,9 +91,10 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
 - [ ] 5. Implement Physics Engine
   - [ ] 5.1 Create Physics Engine component
     - Calculate ghost position using delta time: y_new = y_old + velocity * delta_time
-    - Apply constant gravity (500 px/s² downward)
-    - Apply flap velocity (200 px/s upward on input)
-    - _Requirements: 1.3, 1.4_
+    - Apply constant gravity (800 px/s² downward): velocity_y = velocity_y + 800 * delta_time
+    - Apply flap velocity (-300 px/s upward on input): velocity_y = -300
+    - Apply wall bounce velocity (120 px/s upward): velocity_y = 120
+    - _Requirements: 1.3, 1.4, 1.5_
   
   - [ ] 5.2 Implement delta time capping
     - Cap delta time at 0.1 seconds to prevent physics anomalies
@@ -99,16 +105,18 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
     - **Property 1: Frame-rate independent movement**
     - **Validates: Requirements 12.3, 12.4**
     - Test that position updates are consistent across varying delta times (0.001 to 0.1 seconds)
-    - Verify same result for scaled velocities
+    - Verify same result for scaled velocities using new gravity (800) and flap velocity (-300)
 
 - [ ] 6. Implement Pipe Spawner System
   - [ ] 6.1 Create Pipe Spawner component
     - Generate pipes at regular intervals based on game speed
     - Position pipes on right side when previous pipe exits left side
-    - _Requirements: 2.1_
+    - Set fixed pipe gap height to 140 pixels
+    - Position pipes 350 pixels apart horizontally
+    - _Requirements: 2.1, 2.6_
   
-  - [ ] 6.2 Implement gap randomization
-    - Randomly position gap between 100-250 pixels tall
+  - [ ] 6.2 Implement gap positioning
+    - Position gap at fixed 140 pixels tall
     - Ensure gap stays within bounds (50px minimum from top and bottom edges)
     - _Requirements: 2.2, 2.3, 2.5_
   
@@ -117,10 +125,15 @@ This implementation plan breaks down the Flappy Kiro game development into 15+ m
     - Update positions each frame using delta time
     - _Requirements: 2.4_
   
-  - [ ]* 6.4 Write property test for pipe spacing consistency
+  - [ ] 6.4 Implement pipe spacing
+    - Position new pipe 350 pixels from previous pipe's right edge
+    - Maintain consistent horizontal distance between pipes
+    - _Requirements: 2.6_
+  
+  - [ ]* 6.5 Write property test for pipe spacing consistency
     - **Property 2: Pipe spacing consistency**
-    - **Validates: Requirements 2.1**
-    - Test that distance between consecutive pipes equals interval * speed
+    - **Validates: Requirements 2.1, 2.6**
+    - Test that distance between consecutive pipes equals 350 pixels
     - Generate varying speeds and verify spacing remains consistent
 
 - [ ] 7. Implement Cloud Manager for Perspective Effects
@@ -442,7 +455,7 @@ The following properties are validated through property-based tests:
 | Property | Description | Requirements Validated |
 |----------|-------------|----------------------|
 | 1 | Frame-rate independent movement | 12.3, 12.4 |
-| 2 | Pipe spacing consistency | 2.1 |
+| 2 | Pipe spacing consistency | 2.1, 2.6 |
 | 3 | Score accuracy | 4.1, 4.2 |
 | 4 | High score preservation | 9.1, 9.2, 9.3 |
 | 5 | State transition validity | 5.1, 5.2, 5.3, 5.4 |

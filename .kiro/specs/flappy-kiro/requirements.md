@@ -13,8 +13,10 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 - **Pipe**: Vertical obstacle with a gap that the Ghost must pass through
 - **Score**: Number of pipes successfully navigated
 - **Game Area**: The visible browser window where gameplay occurs
-- **Gravity**: Constant downward force applied to the Ghost
-- **Flap**: Upward movement triggered by player input
+- **Gravity**: Constant downward force applied to the Ghost (800 px/s²)
+- **Flap**: Upward movement triggered by player input (-300 px/s)
+- **Wall Bounce Speed**: Upward movement when colliding with wall (120 px/s)
+- **Wall Distance**: Horizontal distance between consecutive walls (350 px)
 
 ## Requirements
 
@@ -26,8 +28,9 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 
 1. WHEN the player presses the spacebar, THE Game Engine SHALL apply an upward force to the Ghost
 2. WHEN the player clicks the mouse button, THE Game Engine SHALL apply an upward force to the Ghost
-3. WHILE the upward force is applied, THE Ghost SHALL move upward at 200 pixels per second
-4. WHILE no input is detected, THE Gravity Force SHALL continuously pull the Ghost downward at 500 pixels per second squared
+3. WHILE the upward force is applied, THE Ghost SHALL move upward at 300 pixels per second
+4. WHILE no input is detected, THE Gravity Force SHALL continuously pull the Ghost downward at 800 pixels per second squared
+5. WHEN the Ghost collides with a wall, THE Ghost SHALL bounce upward at 120 pixels per second
 
 ### Requirement 2: Pipe Generation and Movement
 
@@ -36,10 +39,11 @@ Flappy Kiro is a browser-based endless scroller game where players guide a ghost
 #### Acceptance Criteria
 
 1. WHERE the game is actively running, WHEN a pipe exits the left side of the Game Area, THE Pipe Spawner SHALL create a new pipe on the right side
-2. WHEN a new pipe is created, THE Pipe Spawner SHALL position it with a gap between 100 and 250 pixels tall
-3. WHEN a pipe is created, THE Pipe Spawner SHALL randomly position the gap vertically within the Game Area
+2. WHEN a new pipe is created, THE Pipe Spawner SHALL position it with a gap of 140 pixels tall
+3. WHEN a new pipe is created, THE Pipe Spawner SHALL position it at a vertical location within the Game Area
 4. WHILE the game is running, THE Pipes SHALL move leftward at 150 pixels per second
 5. WHEN a pipe is created, THE Pipe Spawner SHALL ensure the gap is at least 50 pixels from the top and bottom edges
+6. WHEN a new pipe is created, THE Pipe Spawner SHALL position it 350 pixels from the previous pipe's right edge
 
 ### Requirement 3: Collision Detection
 

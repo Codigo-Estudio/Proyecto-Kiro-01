@@ -70,14 +70,15 @@ The game follows a modular architecture with clear separation of concerns:
    - Maps inputs to game actions (flap)
 
 3. **Physics Engine**
-   - Applies gravity (500 px/s² downward)
-   - Calculates flap velocity (200 px/s upward)
+   - Applies gravity (800 px/s² downward)
+   - Calculates flap velocity (300 px/s upward)
+   - Calculates wall bounce velocity (120 px/s upward)
    - Uses delta time for frame-rate-independent movement
    - Updates ghost position each frame
 
 4. **Pipe Spawner**
-   - Creates pipes at regular intervals
-   - Randomly positions pipe gaps (100-250px tall)
+   - Creates pipes at 350 pixel intervals
+   - Positions pipe gaps at 140 pixels tall
    - Ensures gap stays within bounds (50px minimum from edges)
    - Moves pipes leftward at configurable speed
 
@@ -90,6 +91,7 @@ The game follows a modular architecture with clear separation of concerns:
 6. **Collision Detector**
    - Detects ghost-pipe intersections
    - Detects ghost-screen boundary intersections
+   - Detects wall bounce collision and applies upward velocity
    - Triggers game over state
    - Records collision time for visual effects
 
@@ -365,6 +367,7 @@ interface Ghost {
   width: number;          // 40 pixels
   height: number;         // 40 pixels
   color: string;          // "rgba(200, 200, 200, 0.9)"
+  wallBounceVelocity: number;  // 120 px/s upward
 }
 ```
 
@@ -374,7 +377,7 @@ interface Pipe {
   id: string;             // Unique identifier
   x: number;              // Horizontal position
   gapY: number;           // Vertical position of gap center
-  gapHeight: number;      // Height of gap (100-250px)
+  gapHeight: number;      // Height of gap (140px)
   topPipeHeight: number;  // Calculated from gapY - gapHeight/2
   bottomPipeY: number;    // Calculated from gapY + gapHeight/2
   passed: boolean;        // Whether ghost has passed this pipe
@@ -458,8 +461,9 @@ The configuration system defines all game parameters in a hierarchical structure
 ```typescript
 interface GameConfig {
   // Physics constants
-  gravity: number;              // 500 px/s²
-  flapVelocity: number;         // 200 px/s
+  gravity: number;              // 800 px/s²
+  flapVelocity: number;         // 300 px/s
+  wallBounceVelocity: number;   // 120 px/s
   maxDelta: number;             // 0.1 seconds (frame time cap)
   
   // Entity dimensions
@@ -469,8 +473,8 @@ interface GameConfig {
   
   // Pipe settings
   pipeSpeed: number;            // 150 px/s
-  pipeGapMin: number;           // 100 pixels
-  pipeGapMax: number;           // 250 pixels
+  pipeGapHeight: number;        // 140 pixels (fixed)
+  pipeDistance: number;         // 350 pixels (distance between pipes)
   pipeMargin: number;           // 50 pixels (minimum from screen edges)
   
   // Cloud settings
@@ -503,8 +507,8 @@ interface GameConfig {
 interface DifficultySettings {
   // Base values (initial difficulty)
   basePipeSpeed: number;        // 150 pixels per second
-  baseGapHeight: number;        // 175 pixels (average of 100-250)
-  baseGravity: number;          // 500 pixels per second squared
+  baseGapHeight: number;        // 140 pixels (fixed)
+  baseGravity: number;          // 800 pixels per second squared
   
   // Progression thresholds (score milestones)
   speedIncreaseAt: number;      // Every 5 points, increase speed
@@ -545,7 +549,7 @@ const easyProfile: Partial<GameConfig> = {
 const normalProfile: Partial<GameConfig> = {
   pipeSpeed: 150,           // Standard speed
   pipeGapMin: 100,          // Standard gap
-  gravity: 500,             // Standard gravity
+  gravity: 800,             // Standard gravity
   cloudNearSpeed: 100,
   cloudFarSpeed: 50
 };
@@ -583,30 +587,19 @@ class PhysicsEngine {
 
 #### Pipe Spawner
 ```typescript
-// Uses: config.pipeSpeed, config.pipeGapMin, config.pipeGapMax, config.pipeMargin
+// Uses: config.pipeSpeed, config.pipeGapHeight, config.pipeDistance, config.pipeMargin
 class PipeSpawner {
   constructor(private config: GameConfig) {}
   
   createPipePair(screenHeight: number): Pipe {
-    const gapHeight = this.randomGap();
-    const gapY = this.randomGapPosition(screenHeight);
-    
     return {
-      gapY,
-      gapHeight,
-      topPipeHeight: gapY - gapHeight / 2,
-      bottomPipeY: gapY + gapHeight / 2,
-      // ... other properties
+      gapHeight: this.config.pipeGapHeight,
+      gapY: this.randomGapPosition(screenHeight),
+      topPipeHeight: gapY - this.config.pipeGapHeight / 2,
+      bottomPipeY: gapY + this.config.pipeGapHeight / 2,
+      // ... other properties including pipeDistance for positioning
     };
   }
-  
-  private randomGap(): number {
-    return this.randomRange(
-      this.config.pipeGapMin,
-      this.config.pipeGapMax
-    );
-  }
-}
 ```
 
 #### Cloud Manager
@@ -670,8 +663,9 @@ The configuration system supports multiple loading approaches:
 ```typescript
 const defaultConfig: GameConfig = {
   // Physics constants
-  gravity: 500,
-  flapVelocity: 200,
+  gravity: 800,
+  flapVelocity: 300,
+  wallBounceVelocity: 120,
   maxDelta: 0.1,
   
   // Entity dimensions
@@ -681,8 +675,8 @@ const defaultConfig: GameConfig = {
   
   // Pipe settings
   pipeSpeed: 150,
-  pipeGapMin: 100,
-  pipeGapMax: 250,
+  pipeGapHeight: 140,        // Fixed gap height
+  pipeDistance: 350,         // Distance between pipes
   pipeMargin: 50,
   
   // Cloud settings
@@ -698,8 +692,8 @@ const defaultConfig: GameConfig = {
   // Difficulty progression
   difficulty: {
     basePipeSpeed: 150,
-    baseGapHeight: 175,
-    baseGravity: 500,
+    baseGapHeight: 140,
+    baseGravity: 800,
     speedIncreaseAt: 5,
     gapDecreaseAt: 10,
     gravityIncreaseAt: 15,

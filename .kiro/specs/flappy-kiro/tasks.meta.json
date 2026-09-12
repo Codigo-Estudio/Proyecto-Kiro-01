@@ -1,0 +1,14 @@
+{
+  "pbtResults": {
+    "6.5 Write property test for pipe spacing consistency": {
+      "status": "not_run",
+      "lastRunTimestamp": 1789248683786
+    },
+    "5.3 Write property test for frame-rate independent movement": {
+      "status": "not_run",
+      "failingExample": "Task 6.5 property test has not been run yet",
+      "lastRunTimestamp": 1789248686396
+    }
+  },
+  "executionHistory": {}
+}

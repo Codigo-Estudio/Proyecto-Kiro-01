@@ -1,0 +1,1 @@
+{"physics": {"gravity": 800, "jumpSpeed": -300, "wallBounceSpeed": 120}, "levelDesign": {"gapSize": 140, "distanceBetweenWalls": 350}, "ghost": {"width": 32, "height": 32, "collisionRadius": 12}}
